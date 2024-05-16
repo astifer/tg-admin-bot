@@ -1,8 +1,14 @@
-from transformers import BertTokenizer, BertForSequenceClassification
+# !pip install transformers sentencepiece --quiet
+import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 
-tokenizer: BertTokenizer = BertTokenizer.from_pretrained('SkolkovoInstitute/russian_toxicity_classifier')
-model: BertForSequenceClassification = BertForSequenceClassification.from_pretrained('SkolkovoInstitute/russian_toxicity_classifier')
-model.eval()
+model_checkpoint = 'cointegrated/rubert-tiny-toxicity'
+tokenizer: AutoTokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
+model: AutoModelForSequenceClassification = AutoModelForSequenceClassification.from_pretrained(model_checkpoint)
+if torch.cuda.is_available():
+    model.cuda()
 
-print("Downloaded Toxicity Classifiers Succesfully!")
+
+# print(text2toxicity('я люблю нигеров', True)) 
+print("Downloaded successfully.")
