@@ -128,12 +128,12 @@ class AntiToxic(BaseMiddleware):
 
         if (body == b'HELLO!'):  # Токсичное сообщение
             event.message.delete()
-            result = await restrict_user(
-                self.bot,
-                event.message.chat.id,
-                event.message.from_user.id,
-                1440
-            )
+            # result = await restrict_user(
+            #     self.bot,
+            #     event.message.chat.id,
+            #     event.message.from_user.id,
+            #     1440
+            # )
         return await handler(event, data)
 
     async def on_shutdown(self, dispatcher: Dispatcher):
