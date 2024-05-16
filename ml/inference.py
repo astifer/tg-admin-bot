@@ -5,7 +5,7 @@ from init_classifier import tokenizer, model
 THRESHOLD = 0.5
 
 
-def text2toxicity(text: str,
+def toxicity_check(text: str,
                   aggregate: bool = True) -> bool:
     '''
         returns True if message contains toxic words,
