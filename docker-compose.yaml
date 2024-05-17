@@ -24,5 +24,7 @@ services:
   ml:
     build: ./ml/
     restart: always
+    depends_on:
+      - rabbitmq
     env_file:
       - ./.env

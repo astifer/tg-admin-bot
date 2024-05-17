@@ -126,8 +126,12 @@ class AntiToxic(BaseMiddleware):
             auto_ack=True
         )
 
-        if (body == b'HELLO!'):  # Токсичное сообщение
+        if (body is True):  # Токсичное сообщение
             event.message.delete()
+            self.bot.send_message(
+                event.message.char.id,
+                "Токсичное сообщение удалено"
+            )
             # result = await restrict_user(
             #     self.bot,
             #     event.message.chat.id,
@@ -307,7 +311,6 @@ async def main():
     ))
     dp.include_router(router)
     await dp.start_polling(bot)
-    await dp.shutdown()
 
 if __name__ == "__main__":
     asyncio.run(main())
