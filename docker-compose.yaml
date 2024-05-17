@@ -15,8 +15,8 @@ services:
     restart: always
     env_file:
       ./.env
-    volumes:
-      - ./rabbitmq:/var/lib/rabbitmq
+    # volumes:
+    #   - ./rabbitmq:/var/lib/rabbitmq
     ports:
       - 15672:15672
       # - 5672:5672

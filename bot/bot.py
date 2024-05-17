@@ -1,4 +1,3 @@
-import time
 import asyncio
 import logging
 import functools
@@ -101,6 +100,8 @@ class AntiToxic(BaseMiddleware):
                 host=self.rabbitmq_host,
                 port=self.rabbitmq_port,
                 credentials=credentials,
+                # heartbeat=600,
+                # blocked_connection_timeout=300,
             )
         )
         self.channel = connection.channel()
@@ -114,38 +115,40 @@ class AntiToxic(BaseMiddleware):
         event: Union[Message, Update],
         data: Dict[str, Any]
     ) -> Any:
-        # Кладем в очередь для проверки
-        self.channel.basic_publish(
-                exchange='',
-                routing_key=self.rabbitmq_queue_check,
-                body=event.message.text
-        )
-        await asyncio.sleep(0.5)
-        # Берем результат проверки сообщения на токсичность
-        method, properties, body = self.channel_res.basic_get(
-            queue=self.rabbitmq_queue_result,
-            auto_ack=True
-        )
-        message = "empty"
-        if body:
-            message = body.decode()
+        # Кладем в очередь для проверки, если у сообщения есть текст
+        if event.message.text:
+            self.channel.basic_publish(
+                    exchange='',
+                    routing_key=self.rabbitmq_queue_check,
+                    body=event.message.text
+            )
 
-        logging.info(message)
-        if (message == 'True'):  # Токсичное сообщение
-            await self.bot.delete_message(
-                event.message.chat.id,
-                event.message.message_id
+            await asyncio.sleep(1)
+            # Берем результат проверки сообщения на токсичность
+            method, properties, body = self.channel_res.basic_get(
+                queue=self.rabbitmq_queue_result,
+                auto_ack=True
             )
-            await self.bot.send_message(
-                event.message.chat.id,
-                "Токсичное сообщение удалено"
-            )
-            # result = await restrict_user(
-            #     self.bot,
-            #     event.message.chat.id,
-            #     event.message.from_user.id,
-            #     1440
-            # )
+            message = "empty"
+            if body:
+                message = body.decode()
+
+            logging.info(message)
+            if (message == 'True'):  # Токсичное сообщение
+                await self.bot.delete_message(
+                    event.message.chat.id,
+                    event.message.message_id
+                )
+                await self.bot.send_message(
+                    event.message.chat.id,
+                    "Токсичное сообщение удалено"
+                )
+                # result = await restrict_user(
+                #     self.bot,
+                #     event.message.chat.id,
+                #     event.message.from_user.id,
+                #     1440
+                # )
         return await handler(event, data)
 
     async def on_shutdown(self, dispatcher: Dispatcher):
