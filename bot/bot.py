@@ -1,3 +1,4 @@
+import time
 import asyncio
 import logging
 import functools
@@ -113,23 +114,30 @@ class AntiToxic(BaseMiddleware):
         event: Union[Message, Update],
         data: Dict[str, Any]
     ) -> Any:
-
         # Кладем в очередь для проверки
         self.channel.basic_publish(
                 exchange='',
                 routing_key=self.rabbitmq_queue_check,
                 body=event.message.text
         )
+        await asyncio.sleep(0.5)
         # Берем результат проверки сообщения на токсичность
         method, properties, body = self.channel_res.basic_get(
             queue=self.rabbitmq_queue_result,
             auto_ack=True
         )
+        message = "empty"
+        if body:
+            message = body.decode()
 
-        if (body is True):  # Токсичное сообщение
-            event.message.delete()
-            self.bot.send_message(
-                event.message.char.id,
+        logging.info(message)
+        if (message == 'True'):  # Токсичное сообщение
+            await self.bot.delete_message(
+                event.message.chat.id,
+                event.message.message_id
+            )
+            await self.bot.send_message(
+                event.message.chat.id,
                 "Токсичное сообщение удалено"
             )
             # result = await restrict_user(
@@ -302,7 +310,7 @@ async def kick_user(message: types.Message):
 
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)
-    dp.update.middleware(AntiToxic(
+    dp.update.outer_middleware(AntiToxic(
         bot=bot,
         rabbitmq_host="rabbitmq",
         rabbitmq_port=5672,

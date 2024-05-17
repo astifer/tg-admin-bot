@@ -1,8 +1,12 @@
 import pika
+import logging
 
 from inference import toxicity_check
 from load_env import RABBITMQ_DEFAULT_PASS
 from load_env import RABBITMQ_DEFAULT_USER
+
+
+logging.basicConfig(level=logging.INFO)
 
 
 if __name__ == "__main__":
@@ -25,15 +29,15 @@ if __name__ == "__main__":
     channel_receiver.queue_declare(queue="check")
 
     def callback(ch, method, properties, body):
-        message = body
-        print("CALLBACK")
+        message = body.decode()
+        logging.info(message)
         result = toxicity_check(message)
-
+        logging.info(result)
         # send result of analysis to rabbit queue
         channel_sender.basic_publish(
             exchange="",
             routing_key="result",
-            body=result
+            body=str(result)
         )
 
     # get a tg message from rabbit queue
