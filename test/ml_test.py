@@ -1,5 +1,5 @@
 import pytest 
-from ml import CastomModel
+from ml.init_classifier import model
 
 
 

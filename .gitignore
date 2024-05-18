@@ -3,3 +3,5 @@
 venv
 __pycache__
 rabbitmq
+*/__pycache__/
+*/*/__pycache__
