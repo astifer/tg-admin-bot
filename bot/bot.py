@@ -118,9 +118,9 @@ class AntiToxic(BaseMiddleware):
         # Кладем в очередь для проверки, если у сообщения есть текст
         if event.message.text:
             self.channel.basic_publish(
-                    exchange='',
-                    routing_key=self.rabbitmq_queue_check,
-                    body=event.message.text
+                exchange='',
+                routing_key=self.rabbitmq_queue_check,
+                body=event.message.text
             )
 
             await asyncio.sleep(1)
@@ -215,7 +215,7 @@ async def unmute_user(message: types.Message, command: types.Message):
         )
 
 
-@router.message(Command("mute"),  ChatTypeFilter(chat_type="supergroup"))
+@router.message(Command("mute"), ChatTypeFilter(chat_type="supergroup"))
 @set_privileges('administrator')
 async def mute_user(message: types.Message, command: CommandObject):
     """    Запрещает отправлять сообщения пользователю.
