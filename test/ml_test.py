@@ -1,9 +1,11 @@
-import pytest 
+import pytest
 from ml.inference import toxicity_check
 from ml.inference import THRESHOLD
 
 print(f"Threshold: {THRESHOLD}\n")
 
+
+@pytest.mark.ml_test
 def test_discrimination():
     text_toxic_label = {
         "you are nigger": True,
@@ -14,6 +16,8 @@ def test_discrimination():
     for text, label in text_toxic_label:
         assert toxicity_check(text) == label
 
+
+@pytest.mark.ml_test
 def test_badwords():
     text_toxic_label = {
         "пошел ты нах": True,
@@ -24,4 +28,3 @@ def test_badwords():
 
     for text, label in text_toxic_label:
         assert toxicity_check(text) == label
-

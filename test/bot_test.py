@@ -1,5 +1,4 @@
 import pytest
-
 from test.mocked_bot import echo
 
 from aiogram_tests import MockedBot
