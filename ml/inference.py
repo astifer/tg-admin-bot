@@ -1,8 +1,9 @@
 import torch
+
 from init_classifier import tokenizer, model
 
 
-THRESHOLD = 0.5
+THRESHOLD = 0.7
 
 
 def toxicity_check(text: str,

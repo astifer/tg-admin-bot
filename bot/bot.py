@@ -100,8 +100,8 @@ class AntiToxic(BaseMiddleware):
                 host=self.rabbitmq_host,
                 port=self.rabbitmq_port,
                 credentials=credentials,
-                # heartbeat=600,
-                # blocked_connection_timeout=300,
+                heartbeat=600,
+                blocked_connection_timeout=300,
             )
         )
         self.channel = connection.channel()
@@ -143,12 +143,6 @@ class AntiToxic(BaseMiddleware):
                     event.message.chat.id,
                     "Токсичное сообщение удалено"
                 )
-                # result = await restrict_user(
-                #     self.bot,
-                #     event.message.chat.id,
-                #     event.message.from_user.id,
-                #     1440
-                # )
         return await handler(event, data)
 
     async def on_shutdown(self, dispatcher: Dispatcher):
@@ -170,6 +164,23 @@ async def restrict_user(bot: Bot, chat_id: int, user_id: int, duration: int):
         until_date=new_time,
     )
     return result
+
+
+@router.message(Command("help"))
+async def help(message: types.Message):
+    """     Выводит список доступных команд
+
+    Args:
+        message (types.Message): полученное сообщение /help
+    """
+    await message.reply(
+        "Команды доступные администраторам чата: \n\n\n"
+        "/mute {time} - замутить пользователя на {time} минут \n"
+        "/unmute - размутить пользователя \n"
+        "/kick - выгнать пользователя из чата \n\n\n"
+        "Выполнять команду Вы должны, отвечая на сообщение человека, к которому "
+        "данную команду хотите применить!"
+    )
 
 
 @router.message(Command("unmute"), ChatTypeFilter(chat_type="supergroup"))

@@ -1,6 +1,8 @@
 import pytest
+
 from ml.inference import toxicity_check
 from ml.inference import THRESHOLD
+
 
 print(f"Threshold: {THRESHOLD}\n")
 
